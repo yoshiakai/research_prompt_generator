@@ -198,11 +198,26 @@
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <!-- Sync Settings from A (Visual Only) -->
-                <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 mb-6 flex flex-col md:flex-row gap-4 justify-between items-center">
-                    <div class="text-sm text-slate-600">
-                        <span class="font-bold text-slate-800">出力設定:</span> 
-                        <span id="displaySettingsB">（Step Aの設定を引き継ぎます）</span>
+                <!-- Doc Settings (Editable in Step B) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1" for="purposeSelectB">最終出力目的 <span class="text-rose-500">*</span></label>
+                        <select id="purposeSelectB" class="w-full rounded-lg border-slate-300 border py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 bg-white">
+                            <option value="grad_school_exam">大学院入学試験（修士課程エントリー）</option>
+                            <option value="thesis_proposal">学部卒業論文・修士論文の中間提案</option>
+                            <option value="grant_application">研究助成金・外部資金申請</option>
+                            <option value="project_kickoff">学外コラボ・産学連携プロジェクト企画</option>
+                            <option value="other">その他（自由設定）</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1" for="pageCountSelectB">最終希望分量 <span class="text-rose-500">*</span></label>
+                        <select id="pageCountSelectB" class="w-full rounded-lg border-slate-300 border py-2.5 px-3 text-sm focus:ring-2 focus:ring-indigo-500 bg-white">
+                            <option value="1_page">1枚（A4・約1,000〜1,200字 / 概要・骨子重視）</option>
+                            <option value="2_pages" selected>2枚（A4・約2,000〜2,500字 / 標準的・大学院入試推奨）</option>
+                            <option value="3_4_pages">3〜4枚（A4・約4,000〜5,000字 / 詳細な手法・先行研究含む）</option>
+                            <option value="5_plus">5枚以上（本格的な研究計画・助成金申請等）</option>
+                        </select>
                     </div>
                 </div>
 
@@ -313,17 +328,18 @@
                 contentB.classList.remove('hidden');
                 contentA.classList.add('hidden');
 
-                // Sync display settings for B
-                const pText = purposeSelectA.options[purposeSelectA.selectedIndex].text;
-                const cText = pageCountSelectA.options[pageCountSelectA.selectedIndex].text;
-                document.getElementById('displaySettingsB').textContent = pText + " / " + cText;
+                // Sync display settings for B from A
+                document.getElementById('purposeSelectB').value = purposeSelectA.value;
+                document.getElementById('pageCountSelectB').value = pageCountSelectA.value;
             }
         }
 
         // Generate Step A Prompt
         function generatePromptA() {
-            const purpose = purposeSelectA.options[purposeSelectA.selectedIndex].text;
-            const pageCount = pageCountSelectA.options[pageCountSelectA.selectedIndex].text;
+            const pb = document.getElementById('purposeSelectB');
+            const cb = document.getElementById('pageCountSelectB');
+            const purpose = pb.options[pb.selectedIndex].text;
+            const pageCount = cb.options[cb.selectedIndex].text;
             const field = document.getElementById('fieldSelectA').options[document.getElementById('fieldSelectA').selectedIndex].text;
             const method = document.getElementById('methodSelectA').options[document.getElementById('methodSelectA').selectedIndex].text;
             const llm = document.getElementById('llmSelectA').options[document.getElementById('llmSelectA').selectedIndex].text;
@@ -386,8 +402,10 @@
 
         // Generate Step B Prompt
         function generatePromptB() {
-            const purpose = purposeSelectA.options[purposeSelectA.selectedIndex].text;
-            const pageCount = pageCountSelectA.options[pageCountSelectA.selectedIndex].text;
+            const pb = document.getElementById('purposeSelectB');
+            const cb = document.getElementById('pageCountSelectB');
+            const purpose = pb.options[pb.selectedIndex].text;
+            const pageCount = cb.options[cb.selectedIndex].text;
             
             const t = document.getElementById('reqTitle').value.trim() || '（未入力）';
             const b = document.getElementById('reqBackground').value.trim() || '（未入力）';
